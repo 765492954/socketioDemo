@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title></title>
+	<meta charset="utf-8" />
+</head>
+<body>
+     
+    <a id="new_window">测试推送消息</a>
+    <input id="userid" class="input-xlarge" type="text" placeholder="用户名称. . ." value="1"/>
+    <input id="receiveid" class="input-xlarge" type="text" placeholder="接收对象. . ." value=""/>
+    <input id="message"  class="input-xlarge" type="text" placeholder="发送内容. . ." value="hellow world"/>
+ 
+    <button type="button" onClick="register()" class="btn">登陆</button>
+    <button type="button" onClick="sendMessage()" class="btn">发送</button>
+    <span id="content">收到内容</span>
+    <span></span>
+
+    <script type="text/javascript" src="socket.io.js"></script>
+    <script> 
+             //启动服务
+            getJSON('http://localhost:8080/ServerDemo/startServer')
+
+
+             var socket=io.connect('http://localhost:1233');
+           
+			    socket.on('receive_msg',function(data){ 
+			        console.log(data);                    
+			        document.getElementById("content").innerHTML = document.getElementById("content").innerHTML +"<br/>"+data;
+			    });
+            //注册信息
+			function register()
+			{
+			    var userid = document.getElementById("userid").value;
+			    var message = document.getElementById("message").value;
+			    socket.emit('Register', {
+			        userid: userid,
+			        message: message
+			    });
+			}
+             //发送信息
+			function sendMessage()
+			{
+			    var userid = document.getElementById("userid").value;
+			    var message = document.getElementById("message").value;
+			    var receiveid = document.getElementById("receiveid").value;
+			    socket.emit('Send', {
+			        receiveid: receiveid,
+			        message: message,
+			        pushid: userid
+			    });
+			}
+           //发起请求
+			function getJSON(url) {
+			    return new Promise(function (resolve, reject) {
+			        var xhr = new XMLHttpRequest();
+			        xhr.open('get', url, true);
+			        xhr.responseType = 'json';
+			        xhr.onload = function () {
+			            var status = xhr.status;
+			            if (status == 200) {
+			                resolve(xhr.response);
+			            } else {
+			                reject(status);
+			            }
+			        };
+			        xhr.send();
+			    });
+			};
+ 
+ 
+    </script>
+
+</body>
+</html>
